@@ -29,15 +29,17 @@
         android:layout_marginEnd="48dp"/>
 
     <ImageButton
-        android:id="@+id/hamburger_menu"
+        android:id="@+id/menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        android:src="@drawable/menu"
+        android:contentDescription="Menu Button" />
         <!--
         Replace with your hamburger menu drawable
-        android:src="@drawable/ic_menu"
+        android:src="@drawable/menu"
         android:contentDescription="@string/hamburger_menu_description"
         -->
 

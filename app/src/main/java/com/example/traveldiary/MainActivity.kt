@@ -1,12 +1,15 @@
 package com.example.traveldiary
 
 import android.R
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.traveldiary.databinding.ActivityMainBinding
+import com.example.traveldiary.databinding.DrawerMenuBinding
 import com.example.traveldiary.databinding.ToolbarBinding
 
 
@@ -25,6 +28,30 @@ class MainActivity : AppCompatActivity() {
 
         val toolbarBinding = ToolbarBinding.bind(binding.mytoolbar.root)
         toolbarBinding.toolbarTitle.text = "Home"
+
+
+        // Handle menu button click to open the drawer
+        val drawerLayoutBinding = DrawerMenuBinding.bind(binding.mydrawerMenu.root)
+        toolbarBinding.menu.setOnClickListener{
+            if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                binding.drawerLayout.closeDrawer(GravityCompat.END) // Close the drawer if open
+            } else {
+                binding.drawerLayout.openDrawer(GravityCompat.END) // Open the drawer if closed
+            }
+        }
+
+        // Handle menu item clicks (optional)
+        /*
+        binding.drawerMenu.findViewById<View>(R.id.menuItem1).setOnClickListener {
+            // Perform action for Menu Item 1
+            drawerLayout.closeDrawer(Gravity.END)
+        }
+         */
+        drawerLayoutBinding.menuItem2.setOnClickListener{
+            val intent = Intent(this, CountryList::class.java)
+            startActivity(intent)
+        }
+
 
 
         // Initialize the Spinner with some sample data
