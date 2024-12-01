@@ -1,17 +1,43 @@
 
 //import io.github.cdimascio.dotenv.dotenv
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
+import com.mongodb.ServerApi
+import com.mongodb.ServerApiVersion
 import com.mongodb.kotlin.client.coroutine.MongoClient
-import com.mongodb.kotlin.client.coroutine.MongoCollection
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import org.bson.Document
-import org.bson.codecs.pojo.annotations.BsonId
-import org.bson.types.ObjectId
 
 
-data class Movie(@BsonId val id: ObjectId, val title: String, val genres: List<String>)
+//data class Movie(@BsonId val id: ObjectId, val title: String, val genres: List<String>)
 
 suspend fun main() {
+    val uri = System.getenv("MONGO_URI")
 
+    val serverApi = ServerApi.builder()
+        .version(ServerApiVersion.V1)
+        .build()
+
+    val mongoClientSettings = MongoClientSettings.builder()
+        .applyConnectionString(ConnectionString(uri))
+        .serverApi(serverApi)
+        .build()
+
+    // Create a new client and connect to the server
+    MongoClient.create(mongoClientSettings).use { mongoClient ->
+        val database = mongoClient.getDatabase("diary")
+        runBlocking {
+            database.runCommand(Document("ping", 1))
+        }
+        println("Pinged your deployment. You successfully connected to MongoDB!")
+
+        val collectionNames = database.listCollectionNames().toList()
+        println(collectionNames)
+    }
+
+
+    /*
     // Replace the placeholder with your MongoDB deployment's connection string
     val uri = System.getenv("MONGO_URI")
     val mongoClient = MongoClient.create(uri)
@@ -20,12 +46,10 @@ suspend fun main() {
     val databaseName = "diary"
     val database = mongoClient.getDatabase(databaseName)
 
-    println("Kolekce v databázi '$databaseName':")
-    val collectionNames = database.listCollectionNames().toList()
-    println(collectionNames)
-    for (collectionName in collectionNames) {
-        println("- $collectionName")
-    }
+     */
+    //dbConnect()
+
+
 
     /*
     //ulozeni dokumentu do databaze
@@ -40,6 +64,7 @@ suspend fun main() {
     }
      */
 
+    /*
     // Vyberte kolekci 'countries'
     val collection: MongoCollection<Document> = database.getCollection("countries")
     try {
@@ -65,5 +90,25 @@ suspend fun main() {
 
     mongoClient.close()
 
+     */
+}
+
+suspend fun dbConnect(){
+    // Replace the placeholder with your MongoDB deployment's connection string
+
+    val uri = System.getenv("MONGO_URI")
+    val mongoClient = MongoClient.create(uri)
+
+    // Vyberte databázi
+    val databaseName = "diary"
+    val database = mongoClient.getDatabase(databaseName)
+
+    println("Kolekce v databázi '$databaseName':")
+    val collectionNames = database.listCollectionNames().toList()
+    println(collectionNames)
+    for (collectionName in collectionNames) {
+        println("- $collectionName")
+    }
+    mongoClient.close()
 }
 

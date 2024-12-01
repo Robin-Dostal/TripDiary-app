@@ -66,9 +66,9 @@ dependencies {
 
     //mongodb
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.2.0")
-    implementation("org.mongodb:bson-kotlinx:5.2.0")
-    implementation ("org.mongodb:mongodb-driver-sync:4.10.0")
+    implementation("org.mongodb:bson-kotlin:5.2.0")
     implementation ("org.litote.kmongo:kmongo:4.9.0")
+
 
     implementation ("org.slf4j:slf4j-simple:2.0.9")
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
@@ -76,5 +76,8 @@ dependencies {
     implementation ("io.projectreactor:reactor-core:3.5.11")
     implementation ("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
 
-    //implementation("org.mongodb:mongodb-driver-sync:4.10.0")
+    implementation("io.realm.kotlin:library-sync:1.6.0")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 }
