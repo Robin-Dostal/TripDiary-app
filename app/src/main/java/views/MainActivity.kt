@@ -1,25 +1,18 @@
-package com.example.traveldiary
+package views
 
 import android.R
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.traveldiary.models.Place
+import com.example.traveldiary.adapters.PlacesAdapter
 import com.example.traveldiary.databinding.ActivityMainBinding
 import com.example.traveldiary.databinding.DrawerMenuBinding
 import com.example.traveldiary.databinding.ToolbarBinding
-import com.example.traveldiary.models.Country
-import kotlinx.coroutines.launch
-import network.RetrofitClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 
 class MainActivity : AppCompatActivity() {
@@ -27,11 +20,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var toolbar: Toolbar
     private lateinit var adapter: PlacesAdapter
-    private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        /*
         val api = RetrofitClient.instance
 
         // Fetch countries
@@ -50,20 +43,11 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+         */
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        /*
-        //Zavolej initDatabase() v coroutine
-        lifecycleScope.launch {
-            databaseHelper = DatabaseHelper()
-            databaseHelper.initDatabase()
-        }
-
-         */
-
-        //fetchAndDisplayData()
 
         val toolbarBinding = ToolbarBinding.bind(binding.mytoolbar.root)
         toolbarBinding.toolbarTitle.text = "Home"
@@ -132,21 +116,5 @@ class MainActivity : AppCompatActivity() {
         binding.addPlaceButton.setOnClickListener {
             // Add logic for adding a new place
         }
-    }
-    private fun fetchAndDisplayData() {
-        lifecycleScope.launch {
-            try {
-                val collectionNames = databaseHelper.getCollectionNames()
-                Log.d("MainActivity", "Collections: $collectionNames")
-                // Zobraz kolekce v TextView nebo RecyclerView
-            } catch (e: Exception) {
-                Log.e("MainActivity", "Error fetching collections", e)
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        databaseHelper.close()
     }
 }

@@ -1,8 +1,9 @@
-package com.example.traveldiary
+package com.example.traveldiary.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.traveldiary.models.Place
 import com.example.traveldiary.databinding.ItemPlaceBinding
 
 class PlacesAdapter(private val places: List<Place>) :

@@ -1,4 +1,4 @@
-package com.example.traveldiary
+package com.example.traveldiary.models
 
 data class Place(
     val name: String,
