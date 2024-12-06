@@ -80,4 +80,8 @@ dependencies {
 
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //WorkManager
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
+    implementation ("com.google.guava:guava:31.1-android")
 }

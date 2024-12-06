@@ -41,7 +41,6 @@ class CountryList : AppCompatActivity() {
                     Toast.makeText(this@CountryList, "Failed to fetch countries", Toast.LENGTH_SHORT).show()
                 }
             }
-
             override fun onFailure(call: Call<List<Country>>, t: Throwable) {
                 Toast.makeText(this@CountryList, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
@@ -54,6 +53,7 @@ class CountryList : AppCompatActivity() {
         val toolbarBinding = ToolbarBinding.bind(binding.mytoolbar.root)
         toolbarBinding.toolbarTitle.text = "Countries"
 
+
         // Handle menu button click to open the drawer
         val drawerLayoutBinding = DrawerMenuBinding.bind(binding.mydrawerMenu.root)
         toolbarBinding.menu.setOnClickListener{
@@ -63,6 +63,13 @@ class CountryList : AppCompatActivity() {
                 binding.drawerLayoutCountries.openDrawer(GravityCompat.END) // Open the drawer if closed
             }
         }
+
+        binding.addPlaceButton.setOnClickListener{
+            val intent = Intent(this, CountryAdd::class.java)
+            startActivity(intent)
+        }
+
+
 
         toolbarBinding.logo.setOnClickListener{
             val intent = Intent(this, MainActivity::class.java)
