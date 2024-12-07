@@ -73,11 +73,11 @@ class CountryAdd : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Create Country object
-            val country = Country(countryName, selectedContinent)
+            // Vytvoření objektu Country bez ID
+            val newCountry = Country(name = countryName, continent = selectedContinent)
 
             // Send data to server
-            RetrofitClient.instance.saveCountry(country).enqueue(object : Callback<Void> {
+            RetrofitClient.instance.saveCountry(newCountry).enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
                         Toast.makeText(

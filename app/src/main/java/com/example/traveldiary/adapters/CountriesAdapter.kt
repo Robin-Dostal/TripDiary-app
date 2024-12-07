@@ -8,10 +8,12 @@ import com.example.traveldiary.models.Country
 
 data class Country(val name: String, val continent: String)
 
-class CountryAdapter(private val countries: List<com.example.traveldiary.models.Country>) :
+class CountryAdapter(
+    private val countries: List<com.example.traveldiary.models.Country>,
+    private val onItemClick: (Country) -> Unit) :
     RecyclerView.Adapter<CountryAdapter.CountryViewHolder>() {
 
-    inner class CountryViewHolder(private val binding: ItemPlaceBinding) :
+    inner class CountryViewHolder(val binding: ItemPlaceBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(country: Country) {
             binding.placeNameTextView.text = country.name
@@ -27,7 +29,13 @@ class CountryAdapter(private val countries: List<com.example.traveldiary.models.
     }
 
     override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
+        val country = countries[position]
         holder.bind(countries[position])
+
+        // Set click listener for the root view of the item
+        holder.binding.root.setOnClickListener {
+            onItemClick(country)
+        }
     }
 
     override fun getItemCount(): Int = countries.size

@@ -1,56 +1,106 @@
 package views
 
+import android.R
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.traveldiary.databinding.CountryEditBinding
+import com.example.traveldiary.databinding.CountryAddBinding
+import com.example.traveldiary.models.Country
+import network.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class CountryEdit : AppCompatActivity() {
 
-    private lateinit var binding: CountryEditBinding
+    private lateinit var binding: CountryAddBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = CountryEditBinding.inflate(layoutInflater)
+        binding = CountryAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Example continents
-        val continents = listOf("Africa", "Asia", "Europe", "North America", "Oceania", "South America")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, continents)
-        binding.editContinentSpinner.adapter = adapter
+        val continents = listOf(
+            "Africa",
+            "Antarctica",
+            "Asia",
+            "Europe",
+            "North America",
+            "Australia",
+            "South America"
+        )
 
-        // Fetch country details passed via Intent
-        val countryName = intent.getStringExtra("countryName") ?: ""
-        val countryContinent = intent.getStringExtra("countryContinent") ?: ""
+        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, continents)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerContinent.adapter = adapter
 
-        // Populate fields
-        binding.editCountryName.setText(countryName)
-        val continentIndex = continents.indexOf(countryContinent)
+        // Get the country data passed through intent
+        //id = intent.getStringExtra("id") ?: ""
+        val countryId = intent.getStringExtra("id") ?: ""
+        val countryName = intent.getStringExtra("name") ?: ""
+        val continent = intent.getStringExtra("continent") ?: ""
+
+        // Populate fields with current country data
+        binding.editTextCountryName.setText(countryName)
+        val continentIndex = continents.indexOf(continent)
         if (continentIndex >= 0) {
-            binding.editContinentSpinner.setSelection(continentIndex)
+            binding.spinnerContinent.setSelection(continentIndex)
         }
 
-        // Save button click listener
-        binding.saveButton.setOnClickListener {
-            val updatedName = binding.editCountryName.text.toString()
-            val updatedContinent = binding.editContinentSpinner.selectedItem.toString()
+        // Save button logic
+        binding.buttonSave.setOnClickListener {
+            val updatedName = binding.editTextCountryName.text.toString().trim()
+            val updatedContinent = binding.spinnerContinent.selectedItem.toString()
 
-            if (updatedName.isEmpty()) {
-                Toast.makeText(this, "Country name cannot be empty", Toast.LENGTH_SHORT).show()
+            // Validate input
+            if (updatedName.isEmpty() || updatedContinent == "Select Continent") {
+                Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Send updated details back
-            Toast.makeText(this, "Updated $updatedName in $updatedContinent", Toast.LENGTH_SHORT).show()
-            finish()
-        }
+            // Retrieve the country ID passed to this activity
+            if (countryId.isNullOrEmpty()) {
+                Toast.makeText(this, "Country ID is missing. Cannot update.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-        // Delete button click listener
-        binding.deleteButton.setOnClickListener {
-            // Handle delete logic here
-            Toast.makeText(this, "Deleted $countryName", Toast.LENGTH_SHORT).show()
-            finish()
+            // Prepare updated country data
+            val updatedCountry = Country(
+                _id = countryId, // Use the ID retrieved from the intent
+                name = updatedName,
+                continent = updatedContinent
+            )
+
+            // Make API call to update the country on the server
+            RetrofitClient.instance.updateCountry(updatedCountry).enqueue(object :
+                Callback<Void> { // Assuming your API returns a Void response
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    Log.e("Response", "$response" )
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@CountryEdit, "Country updated successfully", Toast.LENGTH_SHORT).show()
+
+                        // Return the updated country data to the calling activity
+                        val resultIntent = Intent().apply {
+                            //putExtra("id", countryId)
+                            putExtra("updatedName", updatedName)
+                            putExtra("updatedContinent", updatedContinent)
+                        }
+                        setResult(RESULT_OK, resultIntent)
+                        finish() // Close the edit activity
+                    } else {
+                        Log.e("CountryEdit", "Failed to update country. Response code: ${response.code()}")
+                        Log.e("CountryEdit", "Error: ${response.errorBody()?.string()}")
+                        Toast.makeText(this@CountryEdit, "Failed to update country", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Toast.makeText(this@CountryEdit, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
 }
