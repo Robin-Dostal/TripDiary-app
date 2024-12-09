@@ -26,20 +26,7 @@ class CountryAdd : AppCompatActivity() {
         binding = CountryAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val toolbarBinding = ToolbarBinding.bind(binding.mytoolbar.root)
-        toolbarBinding.toolbarTitle.text = "Add Country"
-
-
-        // Handle menu button click to open the drawer
-        val drawerLayoutBinding = DrawerMenuBinding.bind(binding.mydrawerMenu.root)
-        toolbarBinding.menu.setOnClickListener{
-            if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
-                binding.drawerLayout.closeDrawer(GravityCompat.END) // Close the drawer if open
-            } else {
-                binding.drawerLayout.openDrawer(GravityCompat.END) // Open the drawer if closed
-            }
-        }
-
+        menu()
 
         val continents = listOf(
             "Africa",
@@ -56,13 +43,6 @@ class CountryAdd : AppCompatActivity() {
         binding.spinnerContinent.adapter = adapter
 
         // Set a listener to handle item selection
-
-
-
-        toolbarBinding.logo.setOnClickListener{
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
 
         binding.buttonSave.setOnClickListener {
             val countryName = binding.editTextCountryName.text.toString()
@@ -106,6 +86,26 @@ class CountryAdd : AppCompatActivity() {
             })
 
             val intent = Intent(this, CountryList::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun menu() {
+        val toolbarBinding = ToolbarBinding.bind(binding.toolbar.root)
+        toolbarBinding.toolbarTitle.text = "Add country"
+
+        // Handle menu button click to open the drawer
+        val drawerLayoutBinding = DrawerMenuBinding.bind(binding.mydrawerMenu.root)
+        toolbarBinding.menu.setOnClickListener{
+            if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                binding.drawerLayout.closeDrawer(GravityCompat.END) // Close the drawer if open
+            } else {
+                binding.drawerLayout.openDrawer(GravityCompat.END) // Open the drawer if closed
+            }
+        }
+
+        toolbarBinding.logo.setOnClickListener{
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }

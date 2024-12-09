@@ -8,11 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.traveldiary.models.Place
 import com.example.traveldiary.adapters.PlacesAdapter
 import com.example.traveldiary.databinding.ActivityMainBinding
 import com.example.traveldiary.databinding.DrawerMenuBinding
 import com.example.traveldiary.databinding.ToolbarBinding
+import com.example.traveldiary.models.Place
 
 
 class MainActivity : AppCompatActivity() {
@@ -70,6 +70,11 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawer(Gravity.END)
         }
          */
+        drawerLayoutBinding.menuItem1.setOnClickListener{
+            val intent = Intent(this, PlaceAdd::class.java)
+            startActivity(intent)
+        }
+
         drawerLayoutBinding.menuItem2.setOnClickListener{
             val intent = Intent(this, CountryList::class.java)
             startActivity(intent)

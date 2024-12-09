@@ -10,7 +10,7 @@
         android:orientation="vertical">
         <!-- Include the Toolbar -->
         <include
-            android:id="@+id/mytoolbar"
+            android:id="@+id/toolbar"
             layout="@layout/toolbar" />
 
         <androidx.recyclerview.widget.RecyclerView

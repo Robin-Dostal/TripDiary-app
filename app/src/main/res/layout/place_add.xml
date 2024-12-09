@@ -34,6 +34,39 @@
                 android:layout_marginTop="16dp"
                 android:spinnerMode="dropdown" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/buttonSelectDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Select Date" />
+
+                <TextView
+                    android:id="@+id/textViewSelectedDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Selected Date: "
+                    android:textSize="16sp"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/editTextNotes"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginTop="16dp"
+                android:hint="Add notes or details here..."
+                android:inputType="textMultiLine"
+                android:gravity="top|start"
+                android:backgroundTint="@color/black" />
+
+
             <!-- Save and Delete Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"

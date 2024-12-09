@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.traveldiary.adapters.CountryAdapter
 import com.example.traveldiary.databinding.CountryListBinding
+import com.example.traveldiary.databinding.DrawerMenuBinding
 import com.example.traveldiary.databinding.ToolbarBinding
 import com.example.traveldiary.models.Country
 import network.RetrofitClient
@@ -30,9 +32,7 @@ class CountryList : AppCompatActivity() {
         binding = CountryListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val toolbarBinding = ToolbarBinding.bind(binding.mytoolbar.root)
-        toolbarBinding.toolbarTitle.text = "Countries"
-
+        menu()
         fetchCountries()
 
         binding.addPlaceButton.setOnClickListener{
@@ -125,5 +125,29 @@ class CountryList : AppCompatActivity() {
                 Toast.makeText(this@CountryList, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun menu() {
+        val toolbarBinding = ToolbarBinding.bind(binding.toolbar.root)
+        toolbarBinding.toolbarTitle.text = "Countries"
+
+        toolbarBinding.logo.setOnClickListener{
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        val drawerLayoutBinding = DrawerMenuBinding.bind(binding.mydrawerMenu.root)
+        toolbarBinding.menu.setOnClickListener{
+            if (binding.drawerLayoutCountries.isDrawerOpen(GravityCompat.END)) {
+                binding.drawerLayoutCountries.closeDrawer(GravityCompat.END) // Close the drawer if open
+            } else {
+                binding.drawerLayoutCountries.openDrawer(GravityCompat.END) // Open the drawer if closed
+            }
+        }
+
+        drawerLayoutBinding.menuItem2.setOnClickListener{
+            val intent = Intent(this, CountryList::class.java)
+            startActivity(intent)
+        }
     }
 }

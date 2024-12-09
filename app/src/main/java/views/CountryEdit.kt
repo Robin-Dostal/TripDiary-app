@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.traveldiary.databinding.CountryAddBinding
+import com.example.traveldiary.databinding.ToolbarBinding
 import com.example.traveldiary.models.Country
 import network.RetrofitClient
 import retrofit2.Call
@@ -23,6 +24,8 @@ class CountryEdit : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = CountryAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        menu()
 
         val continents = listOf(
             "Africa",
@@ -147,5 +150,15 @@ class CountryEdit : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun menu() {
+        val toolbarBinding = ToolbarBinding.bind(binding.toolbar.root)
+        toolbarBinding.toolbarTitle.text = "Edit country"
+
+        toolbarBinding.logo.setOnClickListener{
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
