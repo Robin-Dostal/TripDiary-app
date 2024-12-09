@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.traveldiary.databinding.CountryAddBinding
 import com.example.traveldiary.models.Country
@@ -102,5 +103,49 @@ class CountryEdit : AppCompatActivity() {
                 }
             })
         }
+
+        // Delete button logic
+        binding.buttonDelete.setOnClickListener {
+            // Validate that the country ID is available
+            if (countryId.isNullOrEmpty()) {
+                Toast.makeText(this, "Country ID is missing. Cannot delete.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Confirm the deletion action (optional)
+            AlertDialog.Builder(this).apply {
+                setTitle("Delete Country")
+                setMessage("Are you sure you want to delete this country?")
+                setPositiveButton("Yes") { _, _ ->
+                    // Make API call to delete the country
+                    RetrofitClient.instance.deleteCountry(countryId).enqueue(object : Callback<Void> {
+                        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                            if (response.isSuccessful) {
+                                Toast.makeText(this@CountryEdit, "Country deleted successfully", Toast.LENGTH_SHORT).show()
+
+                                // Return to the calling activity after deletion
+                                setResult(RESULT_OK) // Optionally, pass additional data if needed
+                                finish() // Close the edit activity
+                            } else {
+                                Log.e("CountryEdit", "Failed to delete country. Response code: ${response.code()}")
+                                Log.e("CountryEdit", "Error: ${response.errorBody()?.string()}")
+                                Toast.makeText(this@CountryEdit, "Failed to delete country", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Void>, t: Throwable) {
+                            Log.e("CountryEdit", "Error: ${t.message}")
+                            Toast.makeText(this@CountryEdit, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+                }
+                setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss() // Close the dialog if the user cancels
+                }
+                create()
+                show()
+            }
+        }
+
     }
 }

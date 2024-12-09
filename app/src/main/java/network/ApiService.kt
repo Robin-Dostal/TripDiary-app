@@ -4,9 +4,11 @@ import com.example.traveldiary.models.Country
 import com.example.traveldiary.models.Place
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 
 
 interface ApiService {
@@ -16,6 +18,8 @@ interface ApiService {
     fun saveCountry(@Body country: Country): Call<Void>
     @PUT("api/countries/update")
     fun updateCountry(@Body country: Country): Call<Void>
+    @DELETE("api/countries/{id}")
+    fun deleteCountry(@Path("id") id: String): Call<Void>
     /*
     @PUT("countries/{id}")
     fun updateCountry(
