@@ -28,8 +28,6 @@ interface ApiService {
     ): Call<Country>
      */
 
-
-
     @GET("api/places")
     fun getPlaces(): Call<List<Place>>
 }
