@@ -145,6 +145,11 @@ class CountryList : AppCompatActivity() {
             }
         }
 
+        drawerLayoutBinding.menuItem1.setOnClickListener{
+            val intent = Intent(this, PlaceAdd::class.java)
+            startActivity(intent)
+        }
+
         drawerLayoutBinding.menuItem2.setOnClickListener{
             val intent = Intent(this, CountryList::class.java)
             startActivity(intent)

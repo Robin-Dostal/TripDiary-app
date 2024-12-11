@@ -37,18 +37,11 @@ class MainActivity : AppCompatActivity() {
         val toolbarBinding = ToolbarBinding.bind(binding.mytoolbar.root)
         toolbarBinding.toolbarTitle.text = "Home"
 
+        menu()
         fetchPlaces()
 
 
         // Handle menu button click to open the drawer
-        val drawerLayoutBinding = DrawerMenuBinding.bind(binding.mydrawerMenu.root)
-        toolbarBinding.menu.setOnClickListener{
-            if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
-                binding.drawerLayout.closeDrawer(GravityCompat.END) // Close the drawer if open
-            } else {
-                binding.drawerLayout.openDrawer(GravityCompat.END) // Open the drawer if closed
-            }
-        }
 
         // Handle menu item clicks (optional)
         /*
@@ -57,15 +50,6 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawer(Gravity.END)
         }
          */
-        drawerLayoutBinding.menuItem1.setOnClickListener{
-            val intent = Intent(this, PlaceAdd::class.java)
-            startActivity(intent)
-        }
-
-        drawerLayoutBinding.menuItem2.setOnClickListener{
-            val intent = Intent(this, CountryList::class.java)
-            startActivity(intent)
-        }
 
         // Initialize the Spinner with some sample data
         val filterOptions = arrayOf("Option 1", "Option 2", "Option 3")
@@ -144,5 +128,34 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun menu() {
+        val toolbarBinding = ToolbarBinding.bind(binding.mytoolbar.root)
+        toolbarBinding.toolbarTitle.text = "Countries"
+
+        toolbarBinding.logo.setOnClickListener{
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        val drawerLayoutBinding = DrawerMenuBinding.bind(binding.mydrawerMenu.root)
+        toolbarBinding.menu.setOnClickListener{
+            if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                binding.drawerLayout.closeDrawer(GravityCompat.END) // Close the drawer if open
+            } else {
+                binding.drawerLayout.openDrawer(GravityCompat.END) // Open the drawer if closed
+            }
+        }
+
+        drawerLayoutBinding.menuItem1.setOnClickListener{
+            val intent = Intent(this, PlaceAdd::class.java)
+            startActivity(intent)
+        }
+
+        drawerLayoutBinding.menuItem2.setOnClickListener{
+            val intent = Intent(this, CountryList::class.java)
+            startActivity(intent)
+        }
     }
 }

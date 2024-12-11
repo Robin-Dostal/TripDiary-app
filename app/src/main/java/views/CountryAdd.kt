@@ -92,9 +92,13 @@ class CountryAdd : AppCompatActivity() {
 
     private fun menu() {
         val toolbarBinding = ToolbarBinding.bind(binding.toolbar.root)
-        toolbarBinding.toolbarTitle.text = "Add country"
+        toolbarBinding.toolbarTitle.text = "Countries"
 
-        // Handle menu button click to open the drawer
+        toolbarBinding.logo.setOnClickListener{
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
         val drawerLayoutBinding = DrawerMenuBinding.bind(binding.mydrawerMenu.root)
         toolbarBinding.menu.setOnClickListener{
             if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
@@ -104,8 +108,13 @@ class CountryAdd : AppCompatActivity() {
             }
         }
 
-        toolbarBinding.logo.setOnClickListener{
-            val intent = Intent(this, MainActivity::class.java)
+        drawerLayoutBinding.menuItem1.setOnClickListener{
+            val intent = Intent(this, PlaceAdd::class.java)
+            startActivity(intent)
+        }
+
+        drawerLayoutBinding.menuItem2.setOnClickListener{
+            val intent = Intent(this, CountryList::class.java)
             startActivity(intent)
         }
     }

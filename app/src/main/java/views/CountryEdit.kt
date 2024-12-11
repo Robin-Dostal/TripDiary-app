@@ -8,7 +8,9 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import com.example.traveldiary.databinding.CountryAddBinding
+import com.example.traveldiary.databinding.DrawerMenuBinding
 import com.example.traveldiary.databinding.ToolbarBinding
 import com.example.traveldiary.models.Country
 import network.RetrofitClient
@@ -154,10 +156,29 @@ class CountryEdit : AppCompatActivity() {
 
     private fun menu() {
         val toolbarBinding = ToolbarBinding.bind(binding.toolbar.root)
-        toolbarBinding.toolbarTitle.text = "Edit country"
+        toolbarBinding.toolbarTitle.text = "Countries"
 
         toolbarBinding.logo.setOnClickListener{
             val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        val drawerLayoutBinding = DrawerMenuBinding.bind(binding.mydrawerMenu.root)
+        toolbarBinding.menu.setOnClickListener{
+            if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                binding.drawerLayout.closeDrawer(GravityCompat.END) // Close the drawer if open
+            } else {
+                binding.drawerLayout.openDrawer(GravityCompat.END) // Open the drawer if closed
+            }
+        }
+
+        drawerLayoutBinding.menuItem1.setOnClickListener{
+            val intent = Intent(this, PlaceAdd::class.java)
+            startActivity(intent)
+        }
+
+        drawerLayoutBinding.menuItem2.setOnClickListener{
+            val intent = Intent(this, CountryList::class.java)
             startActivity(intent)
         }
     }
