@@ -10,10 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.traveldiary.adapters.CountrySpinnerAdapter
 import com.example.traveldiary.adapters.PlacesAdapter
 import com.example.traveldiary.databinding.ActivityMainBinding
 import com.example.traveldiary.databinding.DrawerMenuBinding
 import com.example.traveldiary.databinding.ToolbarBinding
+import com.example.traveldiary.models.Country
 import com.example.traveldiary.models.Place
 import network.RetrofitClient
 import retrofit2.Call
@@ -38,18 +40,9 @@ class MainActivity : AppCompatActivity() {
         toolbarBinding.toolbarTitle.text = "Home"
 
         menu()
+        fetchCountries()
         fetchPlaces()
 
-
-        // Handle menu button click to open the drawer
-
-        // Handle menu item clicks (optional)
-        /*
-        binding.drawerMenu.findViewById<View>(R.id.menuItem1).setOnClickListener {
-            // Perform action for Menu Item 1
-            drawerLayout.closeDrawer(Gravity.END)
-        }
-         */
 
         // Initialize the Spinner with some sample data
         val filterOptions = arrayOf("Option 1", "Option 2", "Option 3")
@@ -63,36 +56,13 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        // Sample data
-        /*
-        val places = listOf(
-            Place("Eiffel Tower", "France / Europe", "2024-01-10"),
-            Place("Great Wall", "China / Asia", "2023-08-15"),
-            Place("Grand Canyon", "USA / North America", "2023-06-05"),
-            Place("Eiffel Tower", "France / Europe", "2024-01-10"),
-            Place("Great Wall", "China / Asia", "2023-08-15"),
-            Place("Grand Canyon", "USA / North America", "2023-06-05"),
-            Place("Eiffel Tower", "France / Europe", "2024-01-10"),
-            Place("Great Wall", "China / Asia", "2023-08-15"),
-            Place("Grand Canyon", "USA / North America", "2023-06-05"),
-            Place("Eiffel Tower", "France / Europe", "2024-01-10"),
-            Place("Great Wall", "China / Asia", "2023-08-15"),
-            Place("Grand Canyon", "USA / North America", "2023-06-05"),
-            Place("Eiffel Tower", "France / Europe", "2024-01-10"),
-            Place("Great Wall", "China / Asia", "2023-08-15"),
-            Place("Kokokokook", "USA / North America", "2023-06-05")
-        )
-
-         */
-
         // Initialize RecyclerView
         binding.placesRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        //binding.placesRecyclerView.adapter = PlacesAdapter(places)
-
         // Button click listener
         binding.addPlaceButton.setOnClickListener {
-            // Add logic for adding a new place
+            val intent = Intent(this, PlaceAdd::class.java)
+            startActivity(intent)
         }
     }
 
@@ -126,6 +96,34 @@ class MainActivity : AppCompatActivity() {
             }
             override fun onFailure(call: Call<List<Place>>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun fetchCountries() {
+        val api = RetrofitClient.instance
+
+        api.getCountries().enqueue(object : Callback<List<Country>> {
+            override fun onResponse(
+                call: Call<List<Country>>,
+                response: Response<List<Country>>
+            ) {
+                if (response.isSuccessful) {
+                    val countries = mutableListOf(Country(name = "All countries", continent = "")) // Add placeholder
+                    countries.addAll(response.body() ?: emptyList()) // Add the fetched countries
+                    Log.e("CountryList", "Fetched countries: $countries")
+
+                    // Populate Spinner with the fetched countries
+                    binding.filterDropdown.adapter = CountrySpinnerAdapter(this@MainActivity, countries)
+                } else {
+                    Log.e(
+                        "CountryList",
+                        "Failed to fetch countries. Response code: ${response.code()}"
+                    )
+                }
+            }
+            override fun onFailure(call: Call<List<Country>>, t: Throwable) {
+                Log.e("CountryList", "Error fetching countries: ${t.message}")
             }
         })
     }

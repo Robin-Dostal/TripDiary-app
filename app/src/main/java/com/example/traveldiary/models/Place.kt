@@ -5,5 +5,6 @@ data class Place(
     val name: String,
     val comment: String,
     val date: String,
-    val countryId: String
+    val countryId: String,
+    val country: Country? = null
 )
