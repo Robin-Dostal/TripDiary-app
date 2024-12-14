@@ -26,6 +26,8 @@
         <activity android:name="views.CountryEdit" android:exported="true" />
         <activity android:name="views.CountryAdd" android:exported="true" />
         <activity android:name="views.PlaceAdd" android:exported="true" />
+        <activity android:name="views.PlaceDetail" android:exported="true" />
+        <activity android:name="views.PlaceEdit" android:exported="true" />
     </application>
 
 </manifest>

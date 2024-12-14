@@ -77,18 +77,20 @@ class MainActivity : AppCompatActivity() {
 
                     // Set up RecyclerView with the data
                     binding.placesRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
-                    binding.placesRecyclerView.adapter = PlacesAdapter(places) {  /* country ->
+                    binding.placesRecyclerView.adapter = PlacesAdapter(places) {  place ->
 
-                        val intent = Intent(this@MainActivity, CountryEdit::class.java).apply {
-                            Log.e("country id", "$country")
-                            putExtra("id", country._id)
-                            putExtra("name", country.name)
-                            putExtra("continent", country.continent)
-                            startActivityForResult(intent, CountryList.EDIT_COUNTRY_REQUEST_CODE) // Single call
+                        val intent = Intent(this@MainActivity, PlaceDetail::class.java).apply {
+                            //Log.e("country id", "$place")
+                            putExtra("id", place._id)
+                            putExtra("name", place.name)
+                            putExtra("date", place.date)
+                            putExtra("comment", place.comment)
+                            putExtra("countryName", place.country?.name)
+                            putExtra("countryContinent", place.country?.continent)
+                            putExtra("countryId", place.country?._id)
+                            //startActivityForResult(intent, CountryList.EDIT_COUNTRY_REQUEST_CODE) // Single call
                         }
                         startActivity(intent)
-
-                         */
                     }
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to fetch countries", Toast.LENGTH_SHORT).show()
