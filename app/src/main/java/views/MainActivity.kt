@@ -35,10 +35,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        val toolbarBinding = ToolbarBinding.bind(binding.mytoolbar.root)
-        toolbarBinding.toolbarTitle.text = "Home"
-
         menu()
         fetchCountries()
         fetchPlaces()
@@ -132,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun menu() {
         val toolbarBinding = ToolbarBinding.bind(binding.mytoolbar.root)
-        toolbarBinding.toolbarTitle.text = "Countries"
+        toolbarBinding.toolbarTitle.text = "Home"
 
         toolbarBinding.logo.setOnClickListener{
             val intent = Intent(this, MainActivity::class.java)

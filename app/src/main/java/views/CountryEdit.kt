@@ -157,7 +157,7 @@ class CountryEdit : AppCompatActivity() {
 
     private fun menu() {
         val toolbarBinding = ToolbarBinding.bind(binding.toolbar.root)
-        toolbarBinding.toolbarTitle.text = "Countries"
+        toolbarBinding.toolbarTitle.text = "Edit country"
 
         toolbarBinding.logo.setOnClickListener{
             val intent = Intent(this, MainActivity::class.java)
