@@ -23,7 +23,7 @@
                 android:id="@+id/textPlaceName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Country name"
+                android:hint="Place name"
                 android:inputType="text"
                 android:backgroundTint="@color/black" />
 

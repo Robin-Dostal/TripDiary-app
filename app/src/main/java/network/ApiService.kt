@@ -20,18 +20,14 @@ interface ApiService {
     fun updateCountry(@Body country: Country): Call<Void>
     @DELETE("api/countries/{id}")
     fun deleteCountry(@Path("id") id: String): Call<Void>
-    /*
-    @PUT("countries/{id}")
-    fun updateCountry(
-        @Path("id") id: String,
-        @Body country: Country
-    ): Call<Country>
-     */
+
 
     @GET("api/places")
     fun getPlaces(): Call<List<Place>>
     @POST("/api/places/save")
     fun savePlace(@Body place: Place): Call<Void>
+    @PUT("api/places/update")
+    fun updatePlace(@Body place: Place): Call<Void>
     @DELETE("api/places/{id}")
     fun deletePlace(@Path("id") id: String): Call<Void>
 }

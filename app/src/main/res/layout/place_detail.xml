@@ -56,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:layout_marginTop="16dp"
-                android:hint="Add notes or details here..."
+                android:hint="No notes here..."
                 android:gravity="top|start"
                 android:backgroundTint="@color/black" />
 

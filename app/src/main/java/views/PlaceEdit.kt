@@ -13,11 +13,15 @@ import com.example.traveldiary.databinding.DrawerMenuBinding
 import com.example.traveldiary.databinding.PlaceAddBinding
 import com.example.traveldiary.databinding.ToolbarBinding
 import com.example.traveldiary.models.Country
+import com.example.traveldiary.models.Place
 import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Locale
 
 class PlaceEdit : AppCompatActivity() {
 
@@ -50,6 +54,66 @@ class PlaceEdit : AppCompatActivity() {
         binding.textViewSelectedDate.setText(formattedDate)
         binding.textNotes.setText(comment)
 
+
+        binding.buttonSave.setOnClickListener {
+            val placeName = binding.textPlaceName.text.toString()
+            val selectedDateText = binding.textViewSelectedDate.text.toString().replace("Selected Date: ", "")
+            val notes = binding.textNotes.text.toString()
+
+            val selectedCountry = binding.spinnerContinent.selectedItem as? Country
+
+            // Validate inputs
+            if (placeName.isEmpty() || selectedDateText.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val formattedDate = try {
+                // Use the correct pattern to match your date format
+                val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
+                val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault()) // ISO format
+                val parsedDate = LocalDate.parse(selectedDateText, inputFormatter)
+                // Convert to ISO 8601 format
+                outputFormatter.format(parsedDate)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val updatedPlace = Place(
+                _id = id,
+                name = placeName,
+                date = formattedDate, // ISO-8601 formatted date
+                comment = notes,
+                countryId = selectedCountry?._id ?: ""
+
+            )
+
+            Log.d("PlaceEdit", "Updated Place: $updatedPlace")
+
+            // Send the updated data to the server using the updatePlace API
+            RetrofitClient.instance.updatePlace(updatedPlace).enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@PlaceEdit, "Place updated successfully", Toast.LENGTH_SHORT).show()
+
+                        // Optionally, return to the previous screen or main activity
+                        setResult(RESULT_OK)  // Optionally pass additional data if needed
+                        val intent = Intent(this@PlaceEdit, MainActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        Log.e("PlaceEdit", "Failed to update place. Response code: ${response.code()}")
+                        Log.e("PlaceEdit", "Error: ${response.errorBody()?.string()}")
+                        Toast.makeText(this@PlaceEdit, "Failed to update place", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Log.e("PlaceEdit", "Error: ${t.message}")
+                    Toast.makeText(this@PlaceEdit, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
         // Delete button logic
         binding.buttonDelete.setOnClickListener {
             // Validate that the country ID is available
@@ -173,7 +237,9 @@ class PlaceEdit : AppCompatActivity() {
         val datePickerDialog = DatePickerDialog(
             this,
             { _, selectedYear, selectedMonth, selectedDay ->
-                val formattedDate = "${selectedDay}/${selectedMonth + 1}/${selectedYear}"
+                val formattedDay = String.format("%02d", selectedDay)
+                val formattedMonth = String.format("%02d", selectedMonth + 1)
+                val formattedDate = "${formattedDay}/${formattedMonth}/${selectedYear}"
                 binding.textViewSelectedDate.text = "Selected Date: $formattedDate"
                 Toast.makeText(this, "Date selected: $formattedDate", Toast.LENGTH_SHORT).show()
             },
