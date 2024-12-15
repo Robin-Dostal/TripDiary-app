@@ -18,7 +18,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
@@ -56,9 +55,10 @@ class PlaceAdd : AppCompatActivity() {
             val formattedDate = try {
                 // Use the correct pattern to match your date format
                 val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
+                val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault()) // ISO format
                 val parsedDate = LocalDate.parse(selectedDateText, inputFormatter)
                 // Convert to ISO 8601 format
-                parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toString()
+                outputFormatter.format(parsedDate)
             } catch (e: Exception) {
                 Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -181,7 +181,9 @@ class PlaceAdd : AppCompatActivity() {
         val datePickerDialog = DatePickerDialog(
             this,
             { _, selectedYear, selectedMonth, selectedDay ->
-                val formattedDate = "${selectedDay}/${selectedMonth + 1}/${selectedYear}"
+                val formattedDay = String.format("%02d", selectedDay)
+                val formattedMonth = String.format("%02d", selectedMonth + 1)
+                val formattedDate = "${formattedDay}/${formattedMonth}/${selectedYear}"
                 binding.textViewSelectedDate.text = "Selected Date: $formattedDate"
                 Toast.makeText(this, "Date selected: $formattedDate", Toast.LENGTH_SHORT).show()
             },
