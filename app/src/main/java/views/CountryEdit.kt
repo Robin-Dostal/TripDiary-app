@@ -56,6 +56,7 @@ class CountryEdit : AppCompatActivity() {
             binding.spinnerContinent.setSelection(continentIndex)
         }
 
+
         // Save button logic
         binding.buttonSave.setOnClickListener {
             val updatedName = binding.editTextCountryName.text.toString().trim()

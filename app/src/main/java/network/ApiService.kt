@@ -30,7 +30,8 @@ interface ApiService {
 
     @GET("api/places")
     fun getPlaces(): Call<List<Place>>
-
     @POST("/api/places/save")
     fun savePlace(@Body place: Place): Call<Void>
+    @DELETE("api/places/{id}")
+    fun deletePlace(@Path("id") id: String): Call<Void>
 }

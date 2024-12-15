@@ -31,7 +31,7 @@ class PlacesAdapter(
                 val date = inputFormat.parse(isoDate)
 
                 // Format the Date object into a readable string
-                val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                 val formattedDate = outputFormat.format(date)
 
                 // Set the formatted date to the TextView

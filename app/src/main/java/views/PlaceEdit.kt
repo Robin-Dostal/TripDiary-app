@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import com.example.traveldiary.adapters.CountrySpinnerAdapter
@@ -12,16 +13,11 @@ import com.example.traveldiary.databinding.DrawerMenuBinding
 import com.example.traveldiary.databinding.PlaceAddBinding
 import com.example.traveldiary.databinding.ToolbarBinding
 import com.example.traveldiary.models.Country
-import com.example.traveldiary.models.Place
 import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Locale
 
 class PlaceEdit : AppCompatActivity() {
 
@@ -40,73 +36,62 @@ class PlaceEdit : AppCompatActivity() {
         menu()
         fetchCountries()
 
-        binding.buttonSave.setOnClickListener {
-            val placeName = binding.textPlaceName.text.toString()
-            val selectedDateText = binding.textViewSelectedDate.text.toString().replace("Selected Date: ", "")
-            val notes = binding.textNotes.text.toString()
+        val id = intent.getStringExtra("id") ?: ""
+        val placeName = intent.getStringExtra("name") ?: ""
+        val date = intent.getStringExtra("date") ?: ""
+        val formattedDate = intent.getStringExtra("formattedDate") ?: ""
+        val comment = intent.getStringExtra("comment") ?: ""
+        val countryId = intent.getStringExtra("countryId") ?: ""
+        val countryName = intent.getStringExtra("countryName") ?: ""
+        val countryContinent = intent.getStringExtra("countryContinent") ?: ""
 
-            val selectedCountry = binding.spinnerContinent.selectedItem as? Country
 
-            // Validate inputs
-            if (placeName.isEmpty() || selectedDateText.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+        binding.textPlaceName.setText(placeName)
+        binding.textViewSelectedDate.setText(formattedDate)
+        binding.textNotes.setText(comment)
+
+        // Delete button logic
+        binding.buttonDelete.setOnClickListener {
+            // Validate that the country ID is available
+            if (id.isNullOrEmpty()) {
+                Toast.makeText(this, "Place ID is missing. Cannot delete.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            // Confirm the deletion action (optional)
+            AlertDialog.Builder(this).apply {
+                setTitle("Delete Place")
+                setMessage("Are you sure you want to delete this place?")
+                setPositiveButton("Yes") { _, _ ->
+                    // Make API call to delete the country
+                    RetrofitClient.instance.deletePlace(id).enqueue(object : Callback<Void> {
+                        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                            if (response.isSuccessful) {
+                                Toast.makeText(this@PlaceEdit, "Place deleted successfully", Toast.LENGTH_SHORT).show()
+                                // Return to the calling activity after deletion
+                                setResult(RESULT_OK) // Optionally, pass additional data if needed
+                                val intent = Intent(this@PlaceEdit, MainActivity::class.java)
+                                startActivity(intent)
+                            } else {
+                                Log.e("PlaceEdit", "Failed to delete place. Response code: ${response.code()}")
+                                Log.e("PlaceEdit", "Error: ${response.errorBody()?.string()}")
+                                Toast.makeText(this@PlaceEdit, "Failed to delete place", Toast.LENGTH_SHORT).show()
+                            }
 
-            val formattedDate = try {
-                // Use the correct pattern to match your date format
-                val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
-                val parsedDate = LocalDate.parse(selectedDateText, inputFormatter)
-                // Convert to ISO 8601 format
-                parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toString()
-            } catch (e: Exception) {
-                Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                        }
+
+                        override fun onFailure(call: Call<Void>, t: Throwable) {
+                            Log.e("PlaceEdit", "Error: ${t.message}")
+                            Toast.makeText(this@PlaceEdit, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+                }
+                setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss() // Close the dialog if the user cancels
+                }
+                create()
+                show()
             }
-
-            // Create the Place object
-            val newPlace = Place(
-                name = placeName,
-                date = formattedDate, // ISO-8601 formatted date
-                comment = notes,
-                countryId = selectedCountry?._id ?: ""
-
-            )
-            Log.d("Place","$newPlace")
-            // Send data to server
-            RetrofitClient.instance.savePlace(newPlace).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    if (response.isSuccessful) {
-                        Toast.makeText(
-                            this@PlaceEdit,
-                            "Place saved successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                        // Redirect to another activity if needed
-                        val intent = Intent(this@PlaceEdit, MainActivity::class.java)
-                        startActivity(intent)
-                    } else {
-                        // Log the error for debugging
-                        Log.e("RetrofitError", "Response code: ${response.code()}, Message: ${response.errorBody()?.string()}")
-                        Toast.makeText(
-                            this@PlaceEdit,
-                            "Failed to save place: ${response.message()}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    Toast.makeText(
-                        this@PlaceEdit,
-                        "Error: ${t.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            })
         }
-
     }
 
 
@@ -141,6 +126,8 @@ class PlaceEdit : AppCompatActivity() {
 
     private fun fetchCountries() {
         val api = RetrofitClient.instance
+        val countryId = intent.getStringExtra("countryId") ?: ""
+        val countryName = intent.getStringExtra("countryName") ?: ""
 
         api.getCountries().enqueue(object : Callback<List<Country>> {
             override fun onResponse(
@@ -152,12 +139,17 @@ class PlaceEdit : AppCompatActivity() {
                     Log.e("CountryList", "Fetched countries: $countries")
 
                     // Populate Spinner with the fetched countries
-                    binding.spinnerContinent.adapter =
-                        CountrySpinnerAdapter(this@PlaceEdit, countries)
+                    val spinnerAdapter = CountrySpinnerAdapter(this@PlaceEdit, countries)
+                    binding.spinnerContinent.adapter = spinnerAdapter
 
-                    // Optionally handle default selection
-                    if (countries.isNotEmpty()) {
-                        binding.spinnerContinent.setSelection(0) // Select the first country by default
+                    // Find the index of the selected country
+                    val selectedIndex = countries.indexOfFirst { it._id == countryId }
+
+                    // Set the selection if a match is found
+                    if (selectedIndex >= 0) {
+                        binding.spinnerContinent.setSelection(selectedIndex)
+                    } else {
+                        Log.w("CountryList", "Country with ID $countryId not found")
                     }
                 } else {
                     Log.e(

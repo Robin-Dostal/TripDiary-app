@@ -22,17 +22,19 @@ class PlaceDetail : AppCompatActivity() {
 
         menu()
 
+        val id = intent.getStringExtra("id") ?: ""
         val placeName = intent.getStringExtra("name") ?: ""
         val date = intent.getStringExtra("date") ?: ""
         val comment = intent.getStringExtra("comment") ?: ""
         val countryName = intent.getStringExtra("countryName") ?: ""
         val countryContinent = intent.getStringExtra("countryContinent") ?: ""
+        val countryId = intent.getStringExtra("countryId") ?: ""
 
         //preformatovani data
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
         inputFormat.timeZone = java.util.TimeZone.getTimeZone("UTC")
         val dateForm = inputFormat.parse(date)
-        val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val formattedDate = outputFormat.format(dateForm)
 
 
@@ -42,7 +44,16 @@ class PlaceDetail : AppCompatActivity() {
         binding.textNotes.setText(comment)
 
         binding.buttonEdit.setOnClickListener {
-            val intent = Intent(this, PlaceEdit::class.java)
+            val intent = Intent(this, PlaceEdit::class.java).apply{
+                putExtra("id", id)
+                putExtra("name", placeName)
+                putExtra("date", date)
+                putExtra("formattedDate", formattedDate)
+                putExtra("comment", comment)
+                putExtra("countryName", countryName)
+                putExtra("countryContinent", countryContinent)
+                putExtra("countryId", countryId)
+            }
             startActivity(intent)
         }
     }
