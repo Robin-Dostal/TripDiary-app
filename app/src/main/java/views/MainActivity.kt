@@ -1,16 +1,15 @@
 package views
 
-import android.R
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.traveldiary.adapters.CountrySpinnerAdapter
 import com.example.traveldiary.adapters.PlacesAdapter
 import com.example.traveldiary.databinding.ActivityMainBinding
 import com.example.traveldiary.databinding.DrawerMenuBinding
@@ -36,24 +35,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         menu()
+        setupSearchBar()
         fetchCountries()
         fetchPlaces()
 
 
-        // Initialize the Spinner with some sample data
-        val filterOptions = arrayOf("Option 1", "Option 2", "Option 3")
-        val adapter = ArrayAdapter(this, R.layout.simple_spinner_item, filterOptions)
-        adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
-        binding.filterDropdown.adapter = adapter // Use binding to access the Spinner
 
         // Initialize the Search Bar
         binding.searchBar.setOnClickListener {
             // You can add functionality for the search bar here
         }
 
-
         // Initialize RecyclerView
-        binding.placesRecyclerView.layoutManager = LinearLayoutManager(this)
+        //binding.placesRecyclerView.layoutManager = LinearLayoutManager(this)
 
         // Button click listener
         binding.addPlaceButton.setOnClickListener {
@@ -68,35 +62,46 @@ class MainActivity : AppCompatActivity() {
         api.getPlaces().enqueue(object : Callback<List<Place>> {
             override fun onResponse(call: Call<List<Place>>, response: Response<List<Place>>) {
                 if (response.isSuccessful) {
-                    val places = response.body() ?: emptyList()
-                    Log.e("PlaceList", "Fetched places: $places")
-
-                    // Set up RecyclerView with the data
-                    binding.placesRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
-                    binding.placesRecyclerView.adapter = PlacesAdapter(places) {  place ->
-
-                        val intent = Intent(this@MainActivity, PlaceDetail::class.java).apply {
-                            //Log.e("country id", "$place")
-                            putExtra("id", place._id)
-                            putExtra("name", place.name)
-                            putExtra("date", place.date)
-                            putExtra("comment", place.comment)
-                            putExtra("countryName", place.country?.name)
-                            putExtra("countryContinent", place.country?.continent)
-                            putExtra("countryId", place.country?._id)
-                            //startActivityForResult(intent, CountryList.EDIT_COUNTRY_REQUEST_CODE) // Single call
-                        }
-                        startActivity(intent)
-                    }
+                    allPlaces = response.body() ?: emptyList() // Save the full list
+                    setupRecyclerView(allPlaces) // Initially show all places
                 } else {
-                    Toast.makeText(this@MainActivity, "Failed to fetch countries", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "Failed to fetch places", Toast.LENGTH_SHORT).show()
                 }
             }
+
             override fun onFailure(call: Call<List<Place>>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
+
+    private fun filterPlaces(query: String) {
+        val filteredPlaces = if (query.isEmpty()) {
+            allPlaces // Show all places if the query is empty
+        } else {
+            allPlaces.filter { place ->
+                place.name.contains(query, ignoreCase = true) // Case-insensitive filtering
+            }
+        }
+        setupRecyclerView(filteredPlaces) // Update RecyclerView with the filtered list
+    }
+
+    private fun setupRecyclerView(places: List<Place>) {
+        binding.placesRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.placesRecyclerView.adapter = PlacesAdapter(places) { place ->
+            val intent = Intent(this, PlaceDetail::class.java).apply {
+                putExtra("id", place._id)
+                putExtra("name", place.name)
+                putExtra("date", place.date)
+                putExtra("comment", place.comment)
+                putExtra("countryName", place.country?.name)
+                putExtra("countryContinent", place.country?.continent)
+                putExtra("countryId", place.country?._id)
+            }
+            startActivity(intent)
+        }
+    }
+
 
     private fun fetchCountries() {
         val api = RetrofitClient.instance
@@ -112,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                     Log.e("CountryList", "Fetched countries: $countries")
 
                     // Populate Spinner with the fetched countries
-                    binding.filterDropdown.adapter = CountrySpinnerAdapter(this@MainActivity, countries)
+                    //binding.filterDropdown.adapter = CountrySpinnerAdapter(this@MainActivity, countries)
                 } else {
                     Log.e(
                         "CountryList",
@@ -123,6 +128,21 @@ class MainActivity : AppCompatActivity() {
             override fun onFailure(call: Call<List<Country>>, t: Throwable) {
                 Log.e("CountryList", "Error fetching countries: ${t.message}")
             }
+        })
+    }
+
+    // Store the original list of places
+    private var allPlaces: List<Place> = emptyList()
+    private fun setupSearchBar() {
+        binding.searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s.toString().trim()
+                filterPlaces(query)
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
         })
     }
 
